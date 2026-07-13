@@ -41,9 +41,14 @@ def generate_lunar_aspects():
         180: "Opposition"
     }
     
-    # 30-day rolling window (checking every hour = 720 checks per planet)
-    # This keeps the file small and Apple Calendar fast.
-    for i in range(30 * 24):
+    # CHANGED: Define a 5-year look-ahead window (1826 days)
+    DAYS_AHEAD = 1826 
+    TOTAL_HOURS = DAYS_AHEAD * 24
+    
+    print(f"Calculating lunar aspects for the next {DAYS_AHEAD} days ({TOTAL_HOURS} hours)...")
+    
+    # Loop through every hour of the 5-year window
+    for i in range(TOTAL_HOURS):
         current_time = today + datetime.timedelta(hours=i)
         next_time = current_time + datetime.timedelta(hours=1)
         
@@ -64,7 +69,6 @@ def generate_lunar_aspects():
                    (sep_now >= aspect_deg and sep_next <= aspect_deg):
                     
                     e = Event()
-                    # Clean, emoji-free text as requested previously
                     e.name = f"Moon {aspect_name} {p_name}"
                     e.begin = current_time
                     e.end = next_time 
@@ -72,6 +76,7 @@ def generate_lunar_aspects():
                     
     with open("lunar_aspects.ics", "w") as f:
         f.writelines(cal.serialize_iter())
+    print("Successfully saved lunar_aspects.ics")
 
 if __name__ == "__main__":
     generate_lunar_aspects()
